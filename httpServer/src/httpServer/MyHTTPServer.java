@@ -25,6 +25,8 @@ import org.json.simple.parser.JSONParser;
 import polygon2DDetection.NotPolygonException;
 import polygon2DDetection.Polygon;
 import polygon2DDetection.PolygonDetection;
+import road.Road;
+import road.RoadNodePosition;
 import vector2D.Position;
 import vector2D.Vector;
 
@@ -87,15 +89,36 @@ public class MyHTTPServer extends Thread {
 
 				Iterator<JSONObject> iterator = jsonArray.iterator();
 				HashMap<String, String> coordinatesList = new HashMap<String, String>();
-				List<Position> p = new ArrayList<Position>();
+				List<RoadNodePosition> nodeRoadList = new ArrayList<RoadNodePosition>();
+				ArrayList<Position> nodeList = new ArrayList<Position>();
+				ArrayList<Road> roads = new ArrayList<Road>();
 
 				while (iterator.hasNext()) 
 				{
 					JSONObject currentElement = iterator.next();
 					if(currentElement.containsKey("type") && currentElement.get("type").equals("node"))
 					{
-						p.add(new Position(Double.parseDouble(currentElement.get("lat").toString()) ,
+						nodeRoadList.add(new RoadNodePosition(Double.parseDouble(currentElement.get("id").toString()), Double.parseDouble(currentElement.get("lat").toString()) ,
 								Double.parseDouble(currentElement.get("lon").toString())) );
+					}
+					if(currentElement.containsKey("type") && currentElement.get("type").equals("way"))
+					{
+						ArrayList<Position> roadNodeList = new ArrayList<Position>();
+						JSONArray jsonWayNodes = (JSONArray) currentElement.get("nodes");
+						
+						Iterator<Long> nodesIterator = jsonWayNodes.iterator();
+						while (nodesIterator.hasNext()) 
+						{
+							Double currentNode = Double.parseDouble(nodesIterator.next().toString());
+							for (int i=0; i < nodeRoadList.size(); i++)
+							{
+								if(nodeRoadList.get(i).getId() == currentNode)
+								{
+									nodeList.add(nodeRoadList.get(i).toPosition());
+								}
+							}
+						}
+						roads.add(new Road(Integer.parseInt(currentElement.get("id").toString()), roadNodeList));
 					}
 				}
 				System.out.println("Positions successfully added");
@@ -177,37 +200,52 @@ public class MyHTTPServer extends Thread {
 				
 				JSONArray patternsList = new JSONArray();
 				JSONObject pattern = null;
-				JSONArray nodeList = null;
+				JSONArray finalNodeList = null;
 				JSONObject node=null;
 
-				ArrayList<ArrayList<Position>> heartResults = PolygonDetection.isTherePolygon(p, heartPattern, APROXIMATION);
+				/*ArrayList<Position> nodeListPosition = new ArrayList<Position>();
+				for (int i = 0; i < nodeList.size(); i++)
+					nodeListPosition.add(nodeList.get(i).toPosition());*/
+				ArrayList<ArrayList<Position>> heartResults = PolygonDetection.isTherePolygon(nodeList, heartPattern, APROXIMATION);
+				//Check roads in heartResult
+				/*ArrayList<int[]> toDelete = new ArrayList<int[]>();
+				for (int i = 0; i < heartResults.size(); i++)
+				{
+					ArrayList<Position> currentPolygon = heartResults.get(i);
+					for(int j = 0; j < currentPolygon.size(); j++)
+					{
+						if(j == currentPolygon.size() - 1)
+							
+					}
+				}*/
 				for(int i=0; i < heartResults.size(); i++)
 				{
 					pattern=new JSONObject();
-					nodeList = new JSONArray();
+					finalNodeList = new JSONArray();
 					for(int j=0; j < heartResults.get(i).size(); j++)
 					{
 						node=new JSONObject();
 						node.put("lat",heartResults.get(i).get(j).getX());
 						node.put("lon",heartResults.get(i).get(j).getY());
-						nodeList.add(node);
+						finalNodeList.add(node);
 					}
 					pattern.put("name", "Heart");
 					pattern.put("nodes", nodeList);
 					patternsList.add(pattern);
 				}
 				System.out.println("Patterns found :" + patternsList.toString());
-				ArrayList<ArrayList<Position>> triangle1Results = PolygonDetection.isTherePolygon(p, triangle1Pattern, APROXIMATION);
+				ArrayList<ArrayList<Position>> triangle1Results = PolygonDetection.isTherePolygon(nodeList, triangle1Pattern, APROXIMATION);
+				//Check roads in trianlge1Results
 				for(int i=0; i < 10 && i < triangle1Results.size(); i++)
 				{
 					pattern=new JSONObject();
-					nodeList = new JSONArray();
+					finalNodeList = new JSONArray();
 					for(int j=0; j < triangle1Results.get(i).size(); j++)
 					{
 						node=new JSONObject();
 						node.put("lat",triangle1Results.get(i).get(j).getX());
 						node.put("lon",triangle1Results.get(i).get(j).getY());
-						nodeList.add(node);
+						finalNodeList.add(node);
 					}
 					pattern.put("name", "Triangle");
 					pattern.put("nodes", nodeList);
@@ -217,6 +255,9 @@ public class MyHTTPServer extends Thread {
 				
 				JSONParser parser1 = new JSONParser();
 				List<Position> patternCoords = new LinkedList<Position>();
+				System.out.println("------------");
+				System.out.println(patternsList.toString());
+				System.out.println("------------");
 				JSONArray jsonPatternsList = (JSONArray) parser1.parse(patternsList.toString());
 				Iterator<JSONObject> patternsIterator = jsonPatternsList.iterator();
 				
@@ -234,7 +275,9 @@ public class MyHTTPServer extends Thread {
 				}
 				System.out.println("Finished ! Took "+ Long.toString(new Date().getTime() - x.getTime()) + " milliseconds" );
 				
-				sendResponse(200, patternsList.toString());
+				System.out.println(roads.toString());
+				
+				sendResponse(200, "ti");
 			}
 			else sendResponse(404, "<b>The Requested resource not found ...." +
 					"Usage: http://127.0.0.1:5000 or http://127.0.0.1:5000/</b>");
