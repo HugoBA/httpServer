@@ -3,7 +3,6 @@ package road;
 import java.util.ArrayList;
 
 import vector2D.Position;
-import vector2D.RoadNodePosition;
 
 /**
  * A road is characterized by an ID and a list of Position
@@ -16,16 +15,16 @@ public class Road
 	 * ID of the road
 	 */
 	private int id;
-
+	
 	/**
 	 * List of the road nodes
 	 */
 	private ArrayList<Position> roadNodes;
-
-	public Road(int id, ArrayList<Position> nodeList)
+	
+	public Road(int id, ArrayList<Position> pointList)
 	{
 		this.id = id;
-		this.roadNodes = nodeList;
+		this.roadNodes = pointList;
 	}
 
 	/**
@@ -43,7 +42,7 @@ public class Road
 	{
 		return roadNodes;
 	}
-
+	
 	/**
 	 * Two roads are considered as equals if their Position list are equals
 	 */
@@ -59,26 +58,26 @@ public class Road
 			return (this.roadNodes.equals(temp.getRoadNodes()));
 		}
 	}
-
+	
 	public int hashCode()
 	{
 		return this.roadNodes.hashCode();
 	}
-
+	
 	public String toString()
 	{
-		return "Road :\nID : "+this.id+"\nPoints :\n"+this.roadNodes.toString();
+		return this.id+this.roadNodes.toString();
 	}
-
+	
 	/**
-	 * @param position the position to search
+	 * @param node the position to search
 	 * @return true if the position is on the road
 	 */
-	public boolean isOnRoad(Position position)
+	public boolean isOnRoad(Position node)
 	{
 		for(int i = 0; i < this.roadNodes.size(); i++)
 		{
-			if (position.equals(this.roadNodes.get(i).equals(position)))
+			if (node.equals(this.roadNodes.get(i)))
 				return true;
 		}
 		return false;

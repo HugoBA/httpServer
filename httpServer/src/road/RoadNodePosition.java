@@ -21,7 +21,7 @@ public class RoadNodePosition extends Position
 	}
 	
 	/**
-	 * @return the correspondig position, with the same coordinates
+	 * @return the corresponding position, with the same coordinates
 	 */
 	public Position toPosition()
 	{

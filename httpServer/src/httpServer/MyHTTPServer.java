@@ -11,17 +11,14 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
 import polygon2DDetection.NotPolygonException;
 import polygon2DDetection.Polygon;
 import polygon2DDetection.PolygonDetection;
@@ -88,11 +85,12 @@ public class MyHTTPServer extends Thread {
 				JSONArray jsonArray = (JSONArray) jsonObject.get("elements");
 
 				Iterator<JSONObject> iterator = jsonArray.iterator();
-				HashMap<String, String> coordinatesList = new HashMap<String, String>();
+				//HashMap<String, String> coordinatesList = new HashMap<String, String>();
 				List<RoadNodePosition> nodeRoadList = new ArrayList<RoadNodePosition>();
 				ArrayList<Position> nodeList = new ArrayList<Position>();
 				ArrayList<Road> roads = new ArrayList<Road>();
 
+				//Récupération des noeuds et routes
 				while (iterator.hasNext()) 
 				{
 					JSONObject currentElement = iterator.next();
@@ -195,7 +193,7 @@ public class MyHTTPServer extends Thread {
 				}
 				catch (NotPolygonException exception)
 				{
-					System.out.println("Erreur cr�ation du triangle");
+					System.out.println("Erreur création du triangle");
 				}
 				
 				JSONArray patternsList = new JSONArray();
@@ -307,7 +305,8 @@ public class MyHTTPServer extends Thread {
 
 	public static void main (String args[]) throws Exception {
 
-		ServerSocket Server = new ServerSocket (5000, 10, InetAddress.getByName("172.20.10.4"));
+		@SuppressWarnings("resource")
+		ServerSocket Server = new ServerSocket (5000, 10, InetAddress.getByName("127.0.0.1"));
 		System.out.println ("TCPServer Waiting for client on port 5000");
 
 		while(true) {
