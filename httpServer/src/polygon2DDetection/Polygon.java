@@ -47,6 +47,27 @@ public class Polygon
 	}
 	
 	/**
+	 * Constructor based on an ArrayList of Positions
+	 * Create the vector from the list
+	 * @param positionList list of position which form the Polygon
+	 * @param name the name of the Polygon
+	 */
+	public Polygon(ArrayList<Position> positionList, String name) throws NotPolygonException
+	{
+		ArrayList<Vector> vectorList = new ArrayList<Vector>();
+		for (int i = 0; i < positionList.size(); i++)
+		{
+			if (i == positionList.size()-1)
+				vectorList.add(new Vector(positionList.get(i),positionList.get(0)));
+			else
+				vectorList.add(new Vector(positionList.get(i), positionList.get(i+1)));
+		}
+		
+		this.name = name;
+		this.vectorList = vectorList;
+	}
+	
+	/**
 	 * @return the name
 	 */
 	public String getName()

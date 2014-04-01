@@ -1,0 +1,31 @@
+<patterns>
+	<pattern>
+		<name>Square</name>
+		<vectors>
+			<vector>2,0</vector>
+			<vector>0,2</vector>
+			<vector>-2,0</vector>
+			<vector>0,-2</vector>
+		</vectors>
+		</pattern>
+	<pattern>
+		<name>Rectangle</name>
+		<vectors>
+			<vector>3,0</vector>
+			<vector>0,2</vector>
+			<vector>-3,0</vector>
+			<vector>0,-2</vector>
+		</vectors>
+	</pattern>
+	<pattern>
+		<name>The House</name>
+		<positionList>
+			<position>44.9146298,4.9145186</position>
+			<position>44.9148567,4.9146612</position>
+			<position>44.9149414,4.9149929</position>
+			<position>44.9147757,4.9154621</position>
+			<position>44.9145304,4.9156112</position>
+			<position>44.9143414,4.915506</position>
+		</positionList>
+	</pattern>
+</patterns>

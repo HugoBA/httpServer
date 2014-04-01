@@ -1,7 +1,6 @@
 package road;
 
 import java.util.ArrayList;
-
 import vector2D.Position;
 
 /**

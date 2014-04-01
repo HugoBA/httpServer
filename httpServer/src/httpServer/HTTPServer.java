@@ -23,6 +23,7 @@ import org.json.simple.parser.JSONParser;
 import polygon2DDetection.NotPolygonException;
 import polygon2DDetection.Polygon;
 import polygon2DDetection.PolygonDetection;
+import polygonDB.PatternFromDB;
 import road.Road;
 import road.RoadCheckPolygon;
 import road.RoadNodePosition;
@@ -54,14 +55,13 @@ public class HTTPServer extends Thread
 	/**
 	 * Approximation radius
 	 */
-	public final static double APROXIMATION = 0.1;
+	public final static double APROXIMATION = 0.01;
 
 	public HTTPServer(Socket client) 
 	{
 		connectedClient = client;
 	}
 	
-	@SuppressWarnings("resource")
 	public static void main (String args[])
 	{
 		System.out.println("HTTPServer.java");
@@ -195,9 +195,9 @@ public class HTTPServer extends Thread
 				System.out.println("Road list :\n"+roads.toString());
 				
 				System.out.println("Positions successfully added");
-				Date x = new Date();
 				System.out.println("Starting seeking patterns");
 
+				
 				/*
 				 * The house :
 				 * 44.9146298, 4.9145186
@@ -214,9 +214,17 @@ public class HTTPServer extends Thread
 				Position h4 = new Position(44.9147757, 4.9154621);
 				Position h5 = new Position(44.9145304, 4.9156112);
 				Position h6 = new Position(44.9143414, 4.915506);
-				Position t1 = new Position(0,0);
+				ArrayList<Position> houseList = new ArrayList<Position>();
+				houseList.add(h1);
+				houseList.add(h2);
+				houseList.add(h3);
+				houseList.add(h4);
+				houseList.add(h5);
+				houseList.add(h6);
+				
+				/*Position t1 = new Position(0,0);
 				Position t2 = new Position(0,3);
-				Position t3 = new Position(3,1);
+				Position t3 = new Position(3,1);*/
 				
 				Vector vh1 = new Vector(h1,h2);
 				Vector vh2 = new Vector(h2,h3);
@@ -224,9 +232,9 @@ public class HTTPServer extends Thread
 				Vector vh4 = new Vector(h4,h5);
 				Vector vh5 = new Vector(h5,h6);
 				Vector vh6 = new Vector(h6,h1);
-				Vector vt1 = new Vector(t1,t2);
+				/*Vector vt1 = new Vector(t1,t2);
 				Vector vt2 = new Vector(t2,t3);
-				Vector vt3 = new Vector(t3,t1);
+				Vector vt3 = new Vector(t3,t1);*/
 				
 				ArrayList<Vector> houseVectorList = new ArrayList<Vector>();
 				houseVectorList.add(vh1);
@@ -235,29 +243,35 @@ public class HTTPServer extends Thread
 				houseVectorList.add(vh4);
 				houseVectorList.add(vh5);
 				houseVectorList.add(vh6);
-				ArrayList<Vector> triangleVectorList = new ArrayList<Vector>();
+				/*ArrayList<Vector> triangleVectorList = new ArrayList<Vector>();
 				triangleVectorList.add(vt1);
 				triangleVectorList.add(vt2);
 				triangleVectorList.add(vt3);
 				
-				Polygon house = null;
+				
+				Polygon house = null, positionHouse = null;
 				Polygon triangle = null;
 				
-				try
-				{
-					house = new Polygon("The house", houseVectorList);
-					triangle = new Polygon("Triangle", triangleVectorList);
-				}
-				catch (NotPolygonException exception)
-				{
-					System.out.println("Polygon creation failed");
-				}
+				house = new Polygon("The hard house", houseVectorList);
+				positionHouse = new Polygon(houseList, "The hard position house");
+				*/
+				ArrayList<Polygon> polygonList = PatternFromDB.getPolygonList();
+				//polygonList.add(house);
+				//polygonList.add(positionHouse);
+				System.out.println(polygonList.toString());
 				
 				JSONArray patternsList = new JSONArray();
 				JSONObject pattern = null;
 				JSONArray finalNodeList = null;
 				JSONObject node=null;
 				
+				ArrayList<ArrayList<ArrayList<Position>>> detectedPolygons = new ArrayList<ArrayList<ArrayList<Position>>>();
+				
+				for(int i=0; i < polygonList.size(); i++)
+				{
+					detectedPolygons.add(PolygonDetection.isTherePolygon(nodeList, polygonList.get(i), APROXIMATION));
+				}
+				/*
 				ArrayList<ArrayList<Position>> houseResults = PolygonDetection.isTherePolygon(nodeList, 
 						house, APROXIMATION);
 				ArrayList<ArrayList<Position>> triangleResult = PolygonDetection.isTherePolygon(nodeList, 
@@ -265,35 +279,47 @@ public class HTTPServer extends Thread
 				System.out.println("List of detected \"house\" :\n"+houseResults.toString());
 				System.out.println("List of detected \"triangle\" :\n"+triangleResult.toString());
 				System.out.println("Clean results :");
+				
 				ArrayList<ArrayList<Position>> cleanHouseResults = 
 						RoadCheckPolygon.getClearedListFromBadPolygonRoad(houseResults, roads);
 				ArrayList<ArrayList<Position>> cleanTriangleResults = 
 						RoadCheckPolygon.getClearedListFromBadPolygonRoad(triangleResult, roads);
+						*/
+				ArrayList<ArrayList<ArrayList<Position>>> cleanedPolygons = new ArrayList<ArrayList<ArrayList<Position>>>();
+				
+				for(int i=0; i < detectedPolygons.size(); i++)
+				{
+					cleanedPolygons.add(RoadCheckPolygon.getClearedListFromBadPolygonRoad(detectedPolygons.get(i), roads));
+				}
+				/*
 				System.out.println("Cleaned \"house\" list :\n"+cleanHouseResults.toString());
 				System.out.println("Cleaned \"triangle\" list :\n"+cleanTriangleResults.toString());
+				*/
+
+				System.out.println(cleanedPolygons.toString());
 				
-				ArrayList results = new ArrayList();
-				results.add(cleanHouseResults);
-				results.add(cleanTriangleResults);
-				
-				
-					for(int i=0; i < 10 && i < cleanTriangleResults.size(); i++)
+				for (int i0 = 0; i0 < cleanedPolygons.size(); i0++)
+				{
+					ArrayList<ArrayList<Position>> currentCleanedPolygonList = cleanedPolygons.get(i0);
+					for(int i=0; i < currentCleanedPolygonList.size(); i++)
 					{
 						pattern=new JSONObject();
 						finalNodeList = new JSONArray();
-						for(int j1=0; j1 < cleanTriangleResults.get(i).size(); j1++)
+						for(int j1 = 0; j1 < currentCleanedPolygonList.get(i).size(); j1++)
 						{
-							node=new JSONObject();
-							node.put("lat",cleanTriangleResults.get(i).get(j1).getX());
-							node.put("lon",cleanTriangleResults.get(i).get(j1).getY());
+							node = new JSONObject();
+							node.put("lat",currentCleanedPolygonList.get(i).get(j1).getX());
+							node.put("lon",currentCleanedPolygonList.get(i).get(j1).getY());
 							finalNodeList.add(node);
 						}
-						pattern.put("name", house.getName());
+						pattern.put("name", polygonList.get(i0).getName());
 						pattern.put("nodes", finalNodeList);
 						patternsList.add(pattern);
 					}
+				}
 				
 				sendResponse(200, patternsList.toJSONString());
+				
 			}
 		}
 		catch (Exception e)

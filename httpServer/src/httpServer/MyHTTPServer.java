@@ -22,6 +22,7 @@ import org.json.simple.parser.JSONParser;
 import polygon2DDetection.NotPolygonException;
 import polygon2DDetection.Polygon;
 import polygon2DDetection.PolygonDetection;
+import polygonDB.PatternFromDB;
 import road.Road;
 import road.RoadNodePosition;
 import vector2D.Position;
@@ -166,7 +167,9 @@ public class MyHTTPServer extends Thread {
 				ArrayList<Vector> vcoeur = new ArrayList<Vector>();
 
 				Polygon triangle1Pattern = null, heartPattern = null;
-
+				
+				ArrayList<Polygon> polygonList = PatternFromDB.getPolygonList();
+				
 				l1.add(v1);
 				l1.add(v2);
 				l1.add(v3);

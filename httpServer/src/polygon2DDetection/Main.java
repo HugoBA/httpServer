@@ -2,7 +2,6 @@ package polygon2DDetection;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import vector2D.Position;
 import vector2D.Vector;
 
@@ -130,16 +129,16 @@ public class Main
 		}
 		catch (NotPolygonException exception)
 		{
-			System.out.println("Erreur création du triangle");
+			System.out.println("Erreur crï¿½ation du triangle");
 		}
 		
-		System.out.println("Forme ˆ dŽtecter : \n\t"+triangle1.toString());
+		System.out.println("Forme ï¿½ dï¿½tecter : \n\t"+triangle1.toString());
 		System.out.println("Nuage de point : \n\t"+p.toString());
-		System.out.println("Résultat : \n\t"+PolygonDetection.isTherePolygon(p, triangle1, APROXIMATION).toString());
+		System.out.println("Rï¿½sultat : \n\t"+PolygonDetection.isTherePolygon(p, triangle1, APROXIMATION).toString());
 		
-		System.out.println("Forme à détecter : \n\t"+coeur.toString());
+		System.out.println("Forme ï¿½ dï¿½tecter : \n\t"+coeur.toString());
 		ArrayList<ArrayList<Position>> franck = PolygonDetection.isTherePolygon(p, coeur, APROXIMATION);
-		System.out.println("Résultat : \n\t"+franck.toString());
+		System.out.println("Rï¿½sultat : \n\t"+franck.toString());
 		System.out.println(franck.size());
 	}
 }

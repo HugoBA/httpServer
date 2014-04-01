@@ -2,7 +2,6 @@ package polygon2DDetection;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import vector2D.NoPositionAvailableException;
 import vector2D.Position;
 import vector2D.PositionProportion;
