@@ -54,7 +54,7 @@ public class HTTPServer extends Thread
 	/**
 	 * Approximation radius
 	 */
-	public final static double APROXIMATION = 0.001;
+	public final static double APROXIMATION = 0.1;
 
 	public HTTPServer(Socket client) 
 	{
@@ -68,15 +68,15 @@ public class HTTPServer extends Thread
 		ServerSocket Server = null;
 		try
 		{
-			Server = new ServerSocket (5000, 10, InetAddress.getByName("127.0.0.1"));
+			Server = new ServerSocket (5000, 10, InetAddress.getByName("192.168.43.247"));
 		}
 		catch (UnknownHostException e)
 		{
-			System.out.println("Hôte inconnu");
+			System.out.println("Unknown host");
 		}
 		catch (IOException e)
 		{
-			System.out.println("Erreur de création du ServerSocket");
+			System.out.println("Socket cration failed");
 		}
 		System.out.println ("TCPServer Waiting for client on port 5000");
 
@@ -89,7 +89,7 @@ public class HTTPServer extends Thread
 			}
 			catch (IOException e)
 			{
-				System.out.println("Erreur de connexion");
+				System.out.println("Connexion failed");
 			}
 			(new HTTPServer(connected)).start();
 		}
@@ -120,6 +120,7 @@ public class HTTPServer extends Thread
 
 				Hashtable<String, String> finaltab= new Hashtable<String, String>();
 				String[] parameterSplitted;
+				
 				for(int i=0; i<parameters.length; i++)
 				{
 					parameterSplitted = parameters[i].split("=");
@@ -127,7 +128,9 @@ public class HTTPServer extends Thread
 				}
 				JSONParser parser = new JSONParser();
 
-
+				System.out.println("Latitude : "+finaltab.get("latitude"));
+				System.out.println("Latitude : "+finaltab.get("longitude"));
+				
 				InputStream inputStream = new URL("http://overpass-api.de/api/interpreter?data=%3Cosm-script%20output%3D%22json%22%3E%0A%20%20%3Cquery%20type%3D%22way%22%3E%0A%20%20%20%20%3"
 						+ "Caround%20lat%3D%22"+finaltab.get("latitude")+"%22%20lon%3D%22"+finaltab.get("longitude")+"%22%20radius%3D%22"+finaltab.get("radius")+"%22%2F%3E%0A"
 						+ "%20%20%20%20%3Chas-kv%20k%3D%22highway%22%20modv%3D%22%22%20v%3D%22%22%2F%3E%0A%20%20%20%20%3Chas-kv%20k%3D%22highway%22%20modv%3D%22not%22%20"
@@ -188,8 +191,8 @@ public class HTTPServer extends Thread
 				for (int i = 0; i < nodeRoadList.size(); i++)
 					nodeList.add(nodeRoadList.get(i).toPosition());
 				
-				System.out.println("Liste des noeuds :\n"+nodeList.toString());
-				System.out.println("Liste des routes :\n"+roads.toString());
+				System.out.println("Node list :\n"+nodeList.toString());
+				System.out.println("Road list :\n"+roads.toString());
 				
 				System.out.println("Positions successfully added");
 				Date x = new Date();
@@ -211,6 +214,9 @@ public class HTTPServer extends Thread
 				Position h4 = new Position(44.9147757, 4.9154621);
 				Position h5 = new Position(44.9145304, 4.9156112);
 				Position h6 = new Position(44.9143414, 4.915506);
+				Position t1 = new Position(0,0);
+				Position t2 = new Position(0,3);
+				Position t3 = new Position(3,1);
 				
 				Vector vh1 = new Vector(h1,h2);
 				Vector vh2 = new Vector(h2,h3);
@@ -218,6 +224,9 @@ public class HTTPServer extends Thread
 				Vector vh4 = new Vector(h4,h5);
 				Vector vh5 = new Vector(h5,h6);
 				Vector vh6 = new Vector(h6,h1);
+				Vector vt1 = new Vector(t1,t2);
+				Vector vt2 = new Vector(t2,t3);
+				Vector vt3 = new Vector(t3,t1);
 				
 				ArrayList<Vector> houseVectorList = new ArrayList<Vector>();
 				houseVectorList.add(vh1);
@@ -226,16 +235,22 @@ public class HTTPServer extends Thread
 				houseVectorList.add(vh4);
 				houseVectorList.add(vh5);
 				houseVectorList.add(vh6);
+				ArrayList<Vector> triangleVectorList = new ArrayList<Vector>();
+				triangleVectorList.add(vt1);
+				triangleVectorList.add(vt2);
+				triangleVectorList.add(vt3);
 				
 				Polygon house = null;
+				Polygon triangle = null;
 				
 				try
 				{
 					house = new Polygon("The house", houseVectorList);
+					triangle = new Polygon("Triangle", triangleVectorList);
 				}
 				catch (NotPolygonException exception)
 				{
-					System.out.println("Erreur création de la maison");
+					System.out.println("Polygon creation failed");
 				}
 				
 				JSONArray patternsList = new JSONArray();
@@ -245,16 +260,63 @@ public class HTTPServer extends Thread
 				
 				ArrayList<ArrayList<Position>> houseResults = PolygonDetection.isTherePolygon(nodeList, 
 						house, APROXIMATION);
-				System.out.println("Liste de \"house\" détectés :\n"+houseResults.toString());
-				System.out.println("Nettoyage des résultats :");
+				ArrayList<ArrayList<Position>> triangleResult = PolygonDetection.isTherePolygon(nodeList, 
+						triangle, APROXIMATION);
+				System.out.println("List of detected \"house\" :\n"+houseResults.toString());
+				System.out.println("List of detected \"triangle\" :\n"+triangleResult.toString());
+				System.out.println("Clean results :");
 				ArrayList<ArrayList<Position>> cleanHouseResults = 
 						RoadCheckPolygon.getClearedListFromBadPolygonRoad(houseResults, roads);
-				System.out.println("Liste de \"house\" valides :\n"+cleanHouseResults.toString());
+				ArrayList<ArrayList<Position>> cleanTriangleResults = 
+						RoadCheckPolygon.getClearedListFromBadPolygonRoad(triangleResult, roads);
+				System.out.println("Cleaned \"house\" list :\n"+cleanHouseResults.toString());
+				System.out.println("Cleaned \"triangle\" list :\n"+cleanTriangleResults.toString());
+				
+				ArrayList results = new ArrayList();
+				results.add(cleanHouseResults);
+				results.add(cleanTriangleResults);
+				
+				
+					for(int i=0; i < 10 && i < cleanTriangleResults.size(); i++)
+					{
+						pattern=new JSONObject();
+						finalNodeList = new JSONArray();
+						for(int j1=0; j1 < cleanTriangleResults.get(i).size(); j1++)
+						{
+							node=new JSONObject();
+							node.put("lat",cleanTriangleResults.get(i).get(j1).getX());
+							node.put("lon",cleanTriangleResults.get(i).get(j1).getY());
+							finalNodeList.add(node);
+						}
+						pattern.put("name", house.getName());
+						pattern.put("nodes", finalNodeList);
+						patternsList.add(pattern);
+					}
+				
+				sendResponse(200, patternsList.toJSONString());
 			}
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public void sendResponse (int statusCode, String responseString) throws Exception 
+	{
+
+		String statusLine = "HTTP/1.1 200 OK" + "\r\n";
+		String serverdetails = "Server: Java HTTPServer";
+		String contentLengthLine = "Content-Length: " + responseString.length();
+		String contentTypeLine = "Content-Type: text/html" + "\r\n";
+
+		outToClient.write(statusLine);
+		outToClient.write(serverdetails);
+		outToClient.write(contentTypeLine);
+		outToClient.write(contentLengthLine);
+		outToClient.write("Connection: close\r\n");
+		outToClient.write("\r\n");
+		outToClient.write(responseString);
+		outToClient.close();
 	}
 }
