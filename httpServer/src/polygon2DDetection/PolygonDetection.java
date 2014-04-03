@@ -2,6 +2,7 @@ package polygon2DDetection;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import vector2D.NoPositionAvailableException;
 import vector2D.Position;
 import vector2D.PositionProportion;
@@ -19,18 +20,18 @@ public abstract class PolygonDetection
 	 * Detect if some points of the given Position collection form the given polygon
 	 * @param pos the Position collection
 	 * @param p the given Polygon to search
-	 * @param APROX the value of approximation
+	 * @param GIVENAPROX the % value of approximation
 	 * @return a list of list of points which forms the polygon
 	 */
-	public static ArrayList<ArrayList<Position>> isTherePolygon(List<Position> pos, Polygon p, double APROX)
+	public static ArrayList<ArrayList<Position>> isTherePolygon(List<Position> pos, Polygon p, double GIVENAPROX)
 	{
 		ArrayList<ArrayList<Position>> result = new ArrayList<ArrayList<Position>>();
-		
+		//TODO (fix) Revoir la proportion
 		//For each point in the list
 		for(int i = 0; i < pos.size(); i++)
 		{
 			//List of point on the vector line applied on the current Position
-			ArrayList<PositionProportion> app = VectorDetection.isOnVectorLine(pos.get(i), p.getVectorList().get(0), pos, APROX);
+			ArrayList<PositionProportion> app = VectorDetection.isOnVectorLine(pos.get(i), p.getVectorList().get(0), pos, GIVENAPROX);
 			
 			for(int j = 0; j < app.size(); j++)
 			{
@@ -47,12 +48,13 @@ public abstract class PolygonDetection
 				{
 					ok = true;
 					Vector currentVector = p.getVectorList().get(vect);
+					double APROX = GIVENAPROX * currentVector.norm();
 					try 
 					{
 						temp = VectorDetection.bestAproxPositionOf(pos,
 								currentVector.multiplied(app.get(j).getProportion()).application(current),
 								APROX);
-					} 
+					}
 					catch (NoPositionAvailableException e) 
 					{
 						ok = false;
@@ -64,7 +66,8 @@ public abstract class PolygonDetection
 				if(form.get(0).equals(form.get(form.size()-1)))
 				{
 					form.remove(form.size()-1);
-					result.add(form);
+					if (form.size() == p.getVectorList().size())
+						result.add(form);
 				}
 			}
 		}

@@ -7,7 +7,7 @@
 			<vector>-2,0</vector>
 			<vector>0,-2</vector>
 		</vectors>
-		</pattern>
+	</pattern>
 	<pattern>
 		<name>Rectangle</name>
 		<vectors>
@@ -18,14 +18,87 @@
 		</vectors>
 	</pattern>
 	<pattern>
-		<name>The House</name>
+		<name>Heart</name>
+		<vectors>
+			<vector>5,7</vector>
+			<vector>-3,4</vector>
+			<vector>-2,-3</vector>
+			<vector>-2,3</vector>
+			<vector>-3,-4</vector>
+			<vector>5,-7</vector>
+		</vectors>
+	</pattern>
+	<pattern>
+		<name>Dog</name>
+		<vectors>
+			<vector>7,0</vector>
+			<vector>0,2</vector>
+			<vector>-7,5</vector>
+			<vector>-4,0</vector>
+			<vector>0,-3</vector>
+			<vector>4,0</vector>
+			<vector>-0,-4</vector>
+		</vectors>
+	</pattern>
+	<pattern>
+		<name>Gun</name>
+		<vectors>
+			<vector>1,0</vector>
+			<vector>0,2</vector>
+			<vector>5,0</vector>
+			<vector>0,1</vector>
+			<vector>-6,0</vector>
+			<vector>0,-3</vector>
+		</vectors>
+	</pattern>
+	<pattern>
+		<name>Plane</name>
+		<vectors>
+			<vector>7,0</vector>
+			<vector>-2,2</vector>
+			<vector>0,2</vector>
+			<vector>5,2</vector>
+			<vector>-5,2</vector>
+			<vector>-1.5,2</vector>
+			<vector>-1.5,-2</vector>
+			<vector>-5,-2</vector>
+			<vector>5,-2</vector>
+			<vector>0,-2</vector>
+			<vector>-2,-2</vector>
+		</vectors>
+	</pattern>
+	<pattern>
+	    <name>The house</name>
+	    <positionList>
+	        <position>44.9146298, 4.9145186</position>
+	        <position>44.9148567, 4.9146612</position>
+	        <position>44.9149414, 4.9149929</position>
+	        <position>44.9147757, 4.9154621</position>
+	        <position>44.9145304, 4.9156112</position>
+	        <position>44.9143414, 4.915506</position>
+	    </positionList>
+	</pattern>
+	<pattern>
+	    <name>The boat</name>
+	    <positionList>
+	        <position>44.929236,4.890689</position>
+	        <position>44.928958,4.89164</position>
+	        <position>44.928958,4.891787</position>
+	        <position>44.928955,4.892824</position>
+	        <position>44.928534,4.893071</position>
+	        <position>44.928496,4.893259</position>
+	        <position>44.92823,4.892963</position>
+	        <position>44.928199,4.89269</position>
+	        <position>44.928777,4.890442</position>
+	    </positionList>
+	</pattern>
+	<pattern>
+		<name>Rectangle</name>
 		<positionList>
 			<position>44.9146298,4.9145186</position>
 			<position>44.9148567,4.9146612</position>
 			<position>44.9149414,4.9149929</position>
 			<position>44.9147757,4.9154621</position>
-			<position>44.9145304,4.9156112</position>
-			<position>44.9143414,4.915506</position>
 		</positionList>
 	</pattern>
 </patterns>
